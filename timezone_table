@@ -1,6 +1,6 @@
 | makeresults count=24
 | streamstats count
-| eval timeJST =  "2024-12-13 ".(count-1).":00:00 EST"
+| eval timeJST =  "2024-12-13 ".(count-1).":00:00 JST"
 | eval timeLOCAL = strftime(strptime(timeJST, "%Y-%m-%d %H:%M:%S %Z"), "%Y-%m-%d %H:%M:%S %Z")
 | table timeJST, timeLOCAL
 | sort timeLOCAL
