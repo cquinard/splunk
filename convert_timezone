@@ -1,0 +1,4 @@
+| makeresults count=4 
+| streamstats count 
+| eval test = case(count=1 OR count=3, "2024-12-13 18:01:11 UTC", count=2 OR count=4, "2024-12-13 18:02:22 UTC")
+| eval foo = strftime(strptime(test, "%Y-%m-%d %H:%M:%S %Z"), "%Y-%m-%d %H:%M:%S %Z")
