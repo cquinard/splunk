@@ -1,0 +1,15 @@
+index=index_name sourcetype=sourcetype_name filter1 filter2 "search_text" 
+| rex field=_raw "text_to_extract_field1(?<field01_left>.*?)\>" 
+| rex field=_raw "text_to_extract_field2(?<field02_left>.*?)\>" 
+| eval leftKey=tostring(field01_left)+"-"+tostring(field02_left) 
+| stats count as output_label_left BY leftKey, field01_left, field02_left 
+| join type=outer left=left_query_name right=right_query_name where left_query_name.leftKey=right_query_name.rightKey
+  [ search index=index_name sourcetype=sourcetype_name filter1 filter2 "another_search_text"
+  | rex field=_raw "text_to_extract_field1(?<field01_right>.*?)\>" 
+  | rex field=_raw "text_to_extract_field2(?<field02_right>.*?)\[" 
+  | eval rightKey=tostring(field01_right)+"-"+tostring(field02_right) 
+  | stats count as output_label_right BY rightKey, field01_right, field02_right ]
+| eval calculation_between=sum('left_query_name.output_label_left')-sum('right_query_name.output_label_right') 
+| where calculation_between > 10 
+| table left_query_name.field01_left, left_query_name.field02_left, left_query_name.output_label_left, right_query_name.output_label_right, calculation_between 
+| sort calculation_between, left_query_name.field01_left, left_query_name.field02_left
