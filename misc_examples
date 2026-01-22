@@ -1,0 +1,21 @@
+``` query sourcetypes defined in app ```
+| metadata type=sourcetypes index=*
+
+``` convert date time and calculate difference ```
+index=index_to_search host=hostname1 "text to search"
+| rex "label_before(?<Response>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.\d{3}-"
+| rex "label_after(?<Request>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.\d{3}-"
+| eval EndTime=strptime(Response, "%Y-%m-%dT%H:%M:%S")
+| eval StartTime=strptime(Request, "%Y-%m-%dT%H:%M:%S")
+| eval TotalTime=EndTime-StartTime
+| where TotalTime >= 20
+| table Request, Response, TotalTime, downstream, source, SOID
+
+``` alternate to table above ```
+| timechart span=1m max(TotalTime) as ResponseTime
+
+``` use rest to query alert saved searches ```
+| rest /servicesNS/-/-/saved/searches
+| search action.email.to="*emailtolookfor@domain.com"
+| table author,title,action.email.to
+| sort +title
