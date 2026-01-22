@@ -1,0 +1,4 @@
+| multisearch
+[ search index=index1 source=source_file1 "text_to_search_for1" | eval seriesName="search1" ]
+[ search index=index1 source=source_file2 "text_to_search_for2" | eval seriesName="search2" ]
+| timechart span=1d count by seriesName
